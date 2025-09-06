@@ -1,5 +1,6 @@
 import './globals.css';
 import Navigation from '@/components/Navigation';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
   title: 'Controle Financeiro',
@@ -38,6 +39,7 @@ export default function RootLayout({
             }
           `
         }} />
+        <Analytics />
       </body>
     </html>
   );

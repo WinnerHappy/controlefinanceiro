@@ -42,19 +42,16 @@ export default function MobileAuth({ onAuthSuccess }: { onAuthSuccess: (user: an
         });
         
         if (error) throw error;
-        if (data.user) onAuthSuccess(data.user);
+        if (data?.user) onAuthSuccess(data.user);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: window.location.origin
-          }
+          password
         });
         
         if (error) throw error;
         
-        if (data.user) {
+        if (data?.user) {
           if (data.user.email_confirmed_at) {
             onAuthSuccess(data.user);
           } else {

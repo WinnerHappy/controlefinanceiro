@@ -29,14 +29,14 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           console.error('Erro de login:', error);
           throw error;
         }
-        if (data.user) onAuthSuccess(data.user);
+        if (data?.user) onAuthSuccess(data.user);
       } else {
         const { data, error } = await auth.signUp(email, password);
         if (error) {
           console.error('Erro de registro:', error);
           throw error;
         }
-        if (data.user) {
+        if (data?.user) {
           alert('Conta criada! Verifique seu email para confirmar.');
           setIsLogin(true);
         }

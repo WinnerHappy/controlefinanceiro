@@ -23,7 +23,7 @@ export default function SimpleAuth({ onAuthSuccess }: { onAuthSuccess: (user: an
         });
         
         if (error) throw error;
-        if (data.user) onAuthSuccess(data.user);
+        if (data?.user) onAuthSuccess(data.user);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,

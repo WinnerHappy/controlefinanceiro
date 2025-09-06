@@ -23,8 +23,11 @@ export const auth = {
   async signUp(email: string, password: string) {
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
+        options: {
+          emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
+        }
       });
       return { data, error };
     } catch (error) {
