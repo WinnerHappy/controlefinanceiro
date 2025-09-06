@@ -1,21 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { auth } from '@/lib/supabase';
-import AuthForm from '@/components/AuthForm';
+import { supabase } from '@/lib/supabase';
+import MobileAuth from '@/components/MobileAuth';
 import Dashboard from '@/components/Dashboard';
-import { User } from '@supabase/supabase-js';
 
 export default function Home() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Verificar se usuário está logado
     const checkUser = async () => {
-      const { user } = await auth.getUser();
-      setUser(user);
-      setLoading(false);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Erro ao verificar usuário:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkUser();
@@ -30,7 +34,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return <AuthForm onAuthSuccess={setUser} />;
+    return <MobileAuth onAuthSuccess={setUser} />;
   }
 
   return <Dashboard user={user} />;

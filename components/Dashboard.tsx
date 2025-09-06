@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
-import { comprasService, contasService, salarioService } from '@/lib/supabase';
+
+import { supabase } from '@/lib/supabase';
 import { 
   ShoppingCart, 
   CreditCard, 
@@ -15,7 +15,7 @@ import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface DashboardProps {
-  user: User;
+  user: any;
 }
 
 interface ResumoMensal {
@@ -47,21 +47,28 @@ export default function Dashboard({ user }: DashboardProps) {
       const fimMes = format(endOfMonth(hoje), 'yyyy-MM-dd');
 
       // Carregar compras do mês
-      const { data: compras } = await comprasService.comprasPorPeriodo(
-        user.id, 
-        inicioMes, 
-        fimMes
-      );
+      const { data: compras } = await supabase
+        .from('compras')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('data', inicioMes)
+        .lte('data', fimMes);
 
       // Carregar contas ativas
-      const { data: contas } = await contasService.listarContas(user.id);
+      const { data: contas } = await supabase
+        .from('contas')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('ativa', true);
 
       // Carregar salário do mês
-      const { data: salario } = await salarioService.salarioDoMes(
-        user.id,
-        hoje.getMonth() + 1,
-        hoje.getFullYear()
-      );
+      const { data: salario } = await supabase
+        .from('salarios')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('mes', hoje.getMonth() + 1)
+        .eq('ano', hoje.getFullYear())
+        .single();
 
       const totalCompras = compras?.reduce((sum, compra) => sum + compra.valor_total, 0) || 0;
       const totalContas = contas?.reduce((sum, conta) => sum + conta.valor, 0) || 0;

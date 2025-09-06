@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { auth } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { 
   ShoppingCart, 
   CreditCard, 
@@ -16,20 +15,20 @@ import {
 } from 'lucide-react';
 
 export default function Navigation() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const checkUser = async () => {
-      const { user } = await auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
     checkUser();
   }, []);
 
   const handleLogout = async () => {
-    await auth.signOut();
+    await supabase.auth.signOut();
     setUser(null);
     window.location.href = '/';
   };

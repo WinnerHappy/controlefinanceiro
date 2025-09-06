@@ -25,18 +25,37 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     try {
       if (isLogin) {
         const { data, error } = await auth.signIn(email, password);
-        if (error) throw error;
+        if (error) {
+          console.error('Erro de login:', error);
+          throw error;
+        }
         if (data.user) onAuthSuccess(data.user);
       } else {
         const { data, error } = await auth.signUp(email, password);
-        if (error) throw error;
+        if (error) {
+          console.error('Erro de registro:', error);
+          throw error;
+        }
         if (data.user) {
-          alert('Verifique seu email para confirmar a conta!');
+          alert('Conta criada! Verifique seu email para confirmar.');
           setIsLogin(true);
         }
       }
     } catch (error: any) {
-      setError(error.message || 'Erro ao processar solicitação');
+      console.error('Erro na autenticação:', error);
+      let errorMessage = 'Erro ao processar solicitação';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Email ou senha incorretos';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Confirme seu email antes de fazer login';
+      } else if (error.message?.includes('User already registered')) {
+        errorMessage = 'Este email já está cadastrado';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -67,15 +86,15 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input-field pl-10"
+                  className="w-full px-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="seu@email.com"
                   required
                 />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               </div>
             </div>
 
@@ -85,16 +104,16 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 Senha
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pl-10 pr-10"
+                  className="w-full px-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-12"
                   placeholder="••••••••"
                   required
                   minLength={6}
                 />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
